@@ -18,7 +18,6 @@ from langchain.vectorstores import VectorStore
 from langchain.vectorstores.faiss import FAISS
 from pypdf import PdfReader
 import os
-from dotenv import load_dotenv
 
 
 
