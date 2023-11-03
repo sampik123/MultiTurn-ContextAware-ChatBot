@@ -41,39 +41,37 @@ def parse_pdf(file: BytesIO) -> List[str]:
 
 # Define a function to convert text content to a list of documents
 @st.cache_data
-def text_to_docs(text):
-    # Ensure input is a list of strings
+def text_to_docs(text: str) -> List[Document]:
+    """Converts a string or list of strings to a list of Documents
+    with metadata."""
     if isinstance(text, str):
+        # Take a single string as one page
         text = [text]
+    page_docs = [Document(page_content=page) for page in text]
 
+    # Add page numbers as metadata
+    for i, doc in enumerate(page_docs):
+        doc.metadata["page"] = i + 1
+
+    # Split pages into chunks
     doc_chunks = []
 
-    # Iterate over pages and text content
-    for i, page_text in enumerate(text, start=1):
-        chunk_size = 2000
-        separators = ["\n\n", "\n", ".", "!", "?", ",", " "]
-
-        # Split page text by newline characters and process each chunk
-        for j, chunk_text in enumerate(page_text.split("\n"), start=1):
-            # Replace specified separators with spaces for consistent chunking
-            for separator in separators:
-                chunk_text = chunk_text.replace(separator, " ")
-
-            # Limit each chunk to a maximum size of 2000 characters
-            chunk_text = chunk_text[:chunk_size]
-
-            # Create a Document for each chunk with appropriate metadata
+    for doc in page_docs:
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000,
+            separators=["\n\n", "\n", ".", "!", "?", ",", " ", ""],
+            chunk_overlap=0,
+        )
+        chunks = text_splitter.split_text(doc.page_content)
+        for i, chunk in enumerate(chunks):
             doc = Document(
-                page_content=chunk_text,
-                metadata={
-                    "page": i,
-                    "chunk": j,
-                    "source": f"{i}-{j}"
-                }
+                page_content=chunk, metadata={"page": doc.metadata["page"], "chunk": i}
             )
+            # Add sources as metadata
+            doc.metadata["source"] = f"{doc.metadata['page']}-{doc.metadata['chunk']}"
             doc_chunks.append(doc)
-
     return doc_chunks
+
 
 
 
