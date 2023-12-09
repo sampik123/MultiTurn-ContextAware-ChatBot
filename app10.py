@@ -78,6 +78,7 @@ def text_to_docs(text: str) -> List[Document]:
 
 
 
+
 # Define a function for the embeddings
 @st.cache_data
 def create_embeddings():
@@ -119,7 +120,7 @@ with st.sidebar:
 
 
 # Set up the Streamlit app
-st.title("Ask any questions from your PDF by uploading it Here")
+st.title("MultiTurn ChatBot-Ask any questions from your PDF by uploading it")
 
 
 
@@ -164,11 +165,8 @@ if uploaded_file:
 
 
 
-            prompt = ZeroShotAgent.create_prompt(tools,
-                prefix=prefix,
-                suffix=suffix,
-                input_variables=["input", "chat_history", "agent_scratchpad"]
-            )
+            prompt = ZeroShotAgent.create_prompt(tools,prefix=prefix, suffix=suffix,
+                                                  input_variables=["input", "chat_history", "agent_scratchpad"])
 
 
             if "memory" not in st.session_state:
@@ -180,6 +178,7 @@ if uploaded_file:
 
             agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
             agent_chain = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, memory=st.session_state.memory)
+            
 
 
             # Allow the user to enter a query and generate a response
@@ -200,6 +199,10 @@ if uploaded_file:
             # Add a "New Chat" button to clear the conversation history
             if st.button("New Chat"):
                 clear_history()
+
+
+
+
 
 
 
