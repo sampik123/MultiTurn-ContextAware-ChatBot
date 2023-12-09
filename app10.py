@@ -11,7 +11,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.docstore.document import Document
 from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import VectorStore
@@ -175,7 +175,7 @@ if uploaded_file:
                 st.session_state.memory = ConversationBufferMemory(memory_key="chat_history")
 
 
-            llm_chain = LLMChain(llm=OpenAI(temperature=0, openai_api_key=api, model_name="gpt-3.5-turbo"), prompt=prompt)
+            llm_chain = LLMChain(llm=ChatOpenAI(temperature=0, openai_api_key=api, model_name="gpt-3.5-turbo"), prompt=prompt)
 
 
             agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
